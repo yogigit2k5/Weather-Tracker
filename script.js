@@ -2,58 +2,76 @@ const API_KEY = "7e75caf90525cfec824355a26aeabe3b";
 
 const searchForm = document.querySelector("#weatherform");
 const cityInput = document.querySelector("#city-input");
-const displayArea = document.querySelector(".info");
+const infoDisplay = document.querySelector("#info-display");
 const cityList = document.querySelector("#city-list");
+const eventLog = document.querySelector("#event-log");
 
-// Load history from local storage
-let visitedCities = JSON.parse(localStorage.getItem("visitedCities")) || [];
+let visitedCities = [];
 
-// Function to refresh the history list on screen
-function showHistory() {
-    cityList.innerHTML = "";
-    visitedCities.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        cityList.appendChild(li);
-    });
-}
+searchForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const city = cityInput.value;
 
-// Main function to get weather
-async function getWeatherData(cityName) {
+
+    eventLog.innerHTML = "";
+
+  
+    const p1 = document.createElement("p");
+    p1.innerHTML = "<span style='color: #58a6ff'>1. Script Started (Sync)</span>";
+    eventLog.appendChild(p1);
+
     try {
-        const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${API_KEY}`;
-        const response = await fetch(url);
+   
+        const p2 = document.createElement("p");
+        p2.innerHTML = "<span style='color: #ffa657'>2. Fetching Data... (Async)</span>";
+        eventLog.appendChild(p2);
+
+        const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}`);
         const data = await response.json();
 
         if (data.cod === 200) {
-            // Success: Update the UI
-            displayArea.innerHTML = `
-                <p><strong>City:</strong> ${data.name}</p>
-                <p><strong>Temp:</strong> ${(data.main.temp - 273.15).toFixed(1)}°C</p>
-                <p><strong>Condition:</strong> ${data.weather[0].main}</p>
-                <p><strong>Humidity:</strong> ${data.main.humidity}%</p>
+            const temp = (data.main.temp - 273.15).toFixed(1);
+               infoDisplay.innerHTML = `
+                <div class="data-row"><strong>City:</strong> ${data.name}</div>
+                <div class="data-row"><strong>Temp:</strong> ${temp}°C</div>
+                <div class="data-row"><strong>Weather:</strong> ${data.weather[0].main}</div>
+                <div class="data-row"><strong>Humidity:</strong> ${data.main.humidity}%</div>
+                <div class="data-row"><strong>Wind:</strong> ${data.wind.speed} m/s</div>
             `;
 
-            // Save to history if not already there
+        
             if (!visitedCities.includes(data.name)) {
                 visitedCities.push(data.name);
+                
+          
+                const tag = document.createElement("div");
+                tag.className = "history-item";
+                tag.textContent = data.name;
+                cityList.appendChild(tag);
+                
+          
                 localStorage.setItem("visitedCities", JSON.stringify(visitedCities));
-                showHistory();
             }
         } else {
-            displayArea.innerHTML = `<p style="color:red">Error: ${data.message}</p>`;
+            infoDisplay.innerHTML = "<p style='color:red'>City not found!</p>";
         }
-    } catch (err) {
-        console.log("Fetch Error:", err);
+
+        const p3 = document.createElement("p");
+        p3.innerHTML = "<span style='color: #ffa657'>3. Data Received (Microtask)</span>";
+        eventLog.appendChild(p3);
+
+    } catch (error) {
+        console.log("Error:", error);
     }
-}
 
-// Listen for form submission
-searchForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const city = cityInput.value;
-    getWeatherData(city);
+    setTimeout(() => {
+        const p4 = document.createElement("p");
+        p4.innerHTML = "<span style='color: #ffa657'>4. Timer Finished (Macrotask)</span>";
+        eventLog.appendChild(p4);
+    }, 0);
+
+
+    const p5 = document.createElement("p");
+    p5.innerHTML = "<span style='color: #58a6ff'>5. Script Ended (Sync)</span>";
+    eventLog.appendChild(p5);
 });
-
-// Run this when page loads
-showHistory();

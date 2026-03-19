@@ -2,27 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Weather Assignment</title>
+    <title>Async Weather Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="main-box">
-        <h2>Weather Search</h2>
-        
-        <form id="weatherform">
-            <input type="text" id="city-input" placeholder="Type city name..." required>
-            <button type="submit">Check Weather</button>
-        </form>
+    <div class="main-dashboard">
+        <header>
+            <h1>🌤️ Async Weather Tracker</h1>
+        </header>
 
-        <div class="info">
+        <div class="top-row">
+            <div class="card search-section">
+                <h3>Search City</h3>
+                <form id="weatherform">
+                    <input type="text" id="city-input" placeholder="e.g. Gurugram">
+                    <button type="submit">Search</button>
+                </form>
+                <h3>Search History</h3>
+                <div id="city-list" class="history-container"></div>
             </div>
 
-        <div class="history-section">
-            <p><strong>Recently Viewed:</strong></p>
-            <ul id="city-list"></ul>
+            <div class="card info-section">
+                <h3>Weather Info</h3>
+                <div id="info-display"></div>
+            </div>
+        </div>
+
+        <div class="card console-section">
+            <h3>Console — Event Loop</h3>
+            <div id="event-log" class="console-box"></div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
+/done
