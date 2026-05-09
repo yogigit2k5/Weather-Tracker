@@ -8,20 +8,30 @@ const eventLog = document.querySelector("#event-log");
 
 let visitedCities = [];
 
-searchForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const city = cityInput.value;
+// Load visited cities from localStorage on page load
+window.addEventListener("load", () => {
+    const storedCities = localStorage.getItem("visitedCities");
+    if (storedCities) {
+        visitedCities = JSON.parse(storedCities);
+        visitedCities.forEach(city => {
+            const tag = document.createElement("div");
+            tag.className = "history-item";
+            tag.textContent = city;
+            tag.addEventListener("click", () => fetchWeather(city));
+            cityList.appendChild(tag);
+        });
+    }
+});
 
-
+// Function to fetch and display weather for a city
+async function fetchWeather(city) {
     eventLog.innerHTML = "";
 
-  
     const p1 = document.createElement("p");
     p1.innerHTML = "<span style='color: #58a6ff'>1. Script Started (Sync)</span>";
     eventLog.appendChild(p1);
 
     try {
-   
         const p2 = document.createElement("p");
         p2.innerHTML = "<span style='color: #ffa657'>2. Fetching Data... (Async)</span>";
         eventLog.appendChild(p2);
@@ -31,7 +41,7 @@ searchForm.addEventListener("submit", async (e) => {
 
         if (data.cod === 200) {
             const temp = (data.main.temp - 273.15).toFixed(1);
-               infoDisplay.innerHTML = `
+            infoDisplay.innerHTML = `
                 <div class="data-row"><strong>City:</strong> ${data.name}</div>
                 <div class="data-row"><strong>Temp:</strong> ${temp}°C</div>
                 <div class="data-row"><strong>Weather:</strong> ${data.weather[0].main}</div>
@@ -39,17 +49,16 @@ searchForm.addEventListener("submit", async (e) => {
                 <div class="data-row"><strong>Wind:</strong> ${data.wind.speed} m/s</div>
             `;
 
-        
+            // Add to history if not already there
             if (!visitedCities.includes(data.name)) {
                 visitedCities.push(data.name);
-                
-          
+
                 const tag = document.createElement("div");
                 tag.className = "history-item";
                 tag.textContent = data.name;
+                tag.addEventListener("click", () => fetchWeather(data.name));
                 cityList.appendChild(tag);
-                
-          
+
                 localStorage.setItem("visitedCities", JSON.stringify(visitedCities));
             }
         } else {
@@ -62,6 +71,7 @@ searchForm.addEventListener("submit", async (e) => {
 
     } catch (error) {
         console.log("Error:", error);
+        infoDisplay.innerHTML = "<p style='color:red'>Error fetching weather data!</p>";
     }
 
     setTimeout(() => {
@@ -70,8 +80,13 @@ searchForm.addEventListener("submit", async (e) => {
         eventLog.appendChild(p4);
     }, 0);
 
-
     const p5 = document.createElement("p");
     p5.innerHTML = "<span style='color: #58a6ff'>5. Script Ended (Sync)</span>";
     eventLog.appendChild(p5);
+}
+
+searchForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const city = cityInput.value;
+    fetchWeather(city);
 });

@@ -74,6 +74,12 @@ button {
     padding: 5px 12px;
     border-radius: 15px;
     font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.history-item:hover {
+    background: #e64a19;
 }
 
 .data-row {
